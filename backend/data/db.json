@@ -1,0 +1,67 @@
+{
+  "users": [
+    {
+      "id": "user_1789662153772_0yqg77",
+      "email": "admin@coorgcup.in",
+      "name": "Coorg Cup Admin",
+      "passwordHash": "$2b$12$kvqCwQVHupI.RYqGMDLNmuUaKfuTmVzYGBpLxG5Lo8SvLyurD/BTK",
+      "role": "admin",
+      "createdAt": "2026-09-17T16:22:34.163Z"
+    },
+    {
+      "id": "user_1789662995477_ymf3b0",
+      "email": "vidishananjappa3@gmail.com",
+      "name": "vidisha",
+      "passwordHash": "$2b$12$uLBUM93jToB3kZIqBmA.4u5ud2x0AMqrC7kaFeJQN./IZLg.Fcmda",
+      "role": "customer",
+      "createdAt": "2026-09-17T16:36:36.267Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "coffee-monsoon-morning",
+      "name": "Monsoon Morning",
+      "roast": "Medium roast",
+      "notes": "Cocoa · Hazelnut · Jaggery",
+      "price": 620,
+      "weight": "250g",
+      "image": "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=900&q=85",
+      "tag": "Bestseller",
+      "active": true
+    },
+    {
+      "id": "coffee-estate-no-7",
+      "name": "Estate No. 7",
+      "roast": "Light roast",
+      "notes": "Orange · Honey · Almond",
+      "price": 680,
+      "weight": "250g",
+      "image": "https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?auto=format&fit=crop&w=900&q=85",
+      "tag": "Single origin",
+      "active": true
+    },
+    {
+      "id": "coffee-midnight-filter",
+      "name": "Midnight Filter",
+      "roast": "Dark roast",
+      "notes": "Dark chocolate · Spice · Smoke",
+      "price": 590,
+      "weight": "250g",
+      "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=85",
+      "tag": "South Indian filter",
+      "active": true
+    }
+  ],
+  "carts": [
+    {
+      "userId": "user_1789662995477_ymf3b0",
+      "items": [
+        {
+          "productId": "coffee-monsoon-morning",
+          "quantity": 3
+        }
+      ]
+    }
+  ],
+  "orders": []
+}

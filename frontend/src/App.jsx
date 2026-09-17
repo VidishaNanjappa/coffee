@@ -3,10 +3,29 @@ import { ArrowRight, Check, ChevronRight, Coffee, Leaf, Menu, Minus, Plus, Shopp
 import './App.css'
 
 const products = [
-  { id: 1, name: 'Monsoon Morning', roast: 'Medium roast', notes: 'Cocoa · Hazelnut · Jaggery', price: 620, weight: '250g', image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=900&q=85', tag: 'Bestseller' },
-  { id: 2, name: 'Estate No. 7', roast: 'Light roast', notes: 'Orange · Honey · Almond', price: 680, weight: '250g', image: 'https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?auto=format&fit=crop&w=900&q=85', tag: 'Single origin' },
-  { id: 3, name: 'Midnight Filter', roast: 'Dark roast', notes: 'Dark chocolate · Spice · Smoke', price: 590, weight: '250g', image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=85', tag: 'South Indian filter' },
+  { id: 'coffee-monsoon-morning', name: 'Monsoon Morning', roast: 'Medium roast', notes: 'Cocoa · Hazelnut · Jaggery', price: 620, weight: '250g', image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=900&q=85', tag: 'Bestseller' },
+  { id: 'coffee-estate-no-7', name: 'Estate No. 7', roast: 'Light roast', notes: 'Orange · Honey · Almond', price: 680, weight: '250g', image: 'https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?auto=format&fit=crop&w=900&q=85', tag: 'Single origin' },
+  { id: 'coffee-midnight-filter', name: 'Midnight Filter', roast: 'Dark roast', notes: 'Dark chocolate · Spice · Smoke', price: 590, weight: '250g', image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=85', tag: 'South Indian filter' },
 ]
+
+const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:4000/api'
+
+async function requestJson(url, options = {}) {
+  const controller = new AbortController()
+  const timeout = window.setTimeout(() => controller.abort(), 8000)
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal })
+    const result = await response.json().catch(() => ({}))
+    if (!response.ok) throw new Error(result.error || `Request failed (${response.status})`)
+    return result
+  } catch (error) {
+    if (error.name === 'AbortError') throw new Error('The backend took too long to respond. Start it with npm run dev in backend.')
+    if (error instanceof TypeError) throw new Error('Cannot reach the backend. Start it with npm run dev in backend.')
+    throw error
+  } finally {
+    window.clearTimeout(timeout)
+  }
+}
 
 function Logo() {
   return <a className="logo" href="#top" aria-label="Coorg Cup home"><span className="logo-mark"><Coffee size={19} strokeWidth={1.8} /></span><span>COORG <b>CUP</b></span></a>
@@ -25,18 +44,24 @@ function useScrollEffects() {
     }, { threshold: 0.14 })
 
     revealItems.forEach((item) => observer.observe(item))
+    let frameId = 0
     const updateProgress = () => {
-      const scrollable = document.documentElement.scrollHeight - window.innerHeight
-      const progress = scrollable > 0 ? window.scrollY / scrollable : 0
-      document.documentElement.style.setProperty('--scroll-progress', progress)
-      document.documentElement.style.setProperty('--hero-shift', `${Math.min(window.scrollY * 0.18, 130)}px`)
-      document.documentElement.style.setProperty('--story-shift', `${Math.max(-window.scrollY * 0.05, -45)}px`)
+      if (frameId) return
+      frameId = requestAnimationFrame(() => {
+        frameId = 0
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight
+        const progress = scrollable > 0 ? window.scrollY / scrollable : 0
+        document.documentElement.style.setProperty('--scroll-progress', progress)
+        document.documentElement.style.setProperty('--hero-shift', `${Math.min(window.scrollY * 0.18, 130)}px`)
+        document.documentElement.style.setProperty('--story-shift', `${Math.max(-window.scrollY * 0.05, -45)}px`)
+      })
     }
 
     updateProgress()
     window.addEventListener('scroll', updateProgress, { passive: true })
     return () => {
       observer.disconnect()
+      cancelAnimationFrame(frameId)
       window.removeEventListener('scroll', updateProgress)
     }
   }, [])
@@ -109,16 +134,27 @@ function App() {
   const [cartOpen, setCartOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
+  const [authMode, setAuthMode] = useState('login')
+  const [authName, setAuthName] = useState('')
+  const [authEmail, setAuthEmail] = useState('')
+  const [authPassword, setAuthPassword] = useState('')
+  const [authMessage, setAuthMessage] = useState('')
+  const [checkoutMessage, setCheckoutMessage] = useState('')
+  const [authLoading, setAuthLoading] = useState(false)
 
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0)
   const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0)
+  const authTitle = authMode === 'login' ? 'Sign in to pay' : 'Create your account'
+  let authSubmitLabel = authMode === 'login' ? 'Sign in and continue' : 'Create and continue'
+  if (authLoading) authSubmitLabel = 'Please wait...'
+  const authSwitchLabel = authMode === 'login' ? 'Need an account? Create one' : 'Already have an account? Sign in'
 
   useScrollEffects()
 
   function addToCart(product) {
     setCart((current) => {
-      const match = current.find((item) => item.id === product.id)
-      return match
+      const hasMatch = current.some((item) => item.id === product.id)
+      return hasMatch
         ? current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
         : [...current, { ...product, quantity: 1 }]
     })
@@ -127,6 +163,52 @@ function App() {
 
   function changeQuantity(id, amount) {
     setCart((current) => current.map((item) => item.id === id ? { ...item, quantity: item.quantity + amount } : item).filter((item) => item.quantity > 0))
+  }
+
+  async function completeCheckout(token) {
+    await Promise.all(cart.map((item) => requestJson(`${apiBase}/cart/items`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ productId: item.id, quantity: item.quantity }) })))
+    const result = await requestJson(`${apiBase}/payments/checkout`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } })
+    if (result.checkoutUrl) window.location.assign(result.checkoutUrl)
+    else {
+      setCheckoutMessage(result.message || 'Checkout is ready.')
+      setAuthMessage('Signed in successfully.')
+    }
+  }
+
+  async function handleCheckout() {
+    setCheckoutMessage('')
+    const token = window.localStorage.getItem('coorg-cup-token')
+    if (!token) {
+      setCheckoutMessage('Sign in or create an account to continue.')
+      return
+    }
+    try {
+      await completeCheckout(token)
+    } catch (error) {
+      window.localStorage.removeItem('coorg-cup-token')
+      setCheckoutMessage(error.message)
+    }
+  }
+
+  async function handleAuth(event) {
+    event.preventDefault()
+    setAuthLoading(true)
+    setAuthMessage('')
+    try {
+      const result = await requestJson(`${apiBase}/auth/${authMode === 'login' ? 'login' : 'register'}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: authName, email: authEmail, password: authPassword }),
+      })
+      window.localStorage.setItem('coorg-cup-token', result.token)
+      setAuthMessage('Signed in. Starting checkout...')
+      await completeCheckout(result.token)
+    } catch (error) {
+      setAuthMessage(error.message)
+      setCheckoutMessage(error.message)
+    } finally {
+      setAuthLoading(false)
+    }
   }
 
   return (
@@ -196,7 +278,7 @@ function App() {
         <div className="cart-content">
           {cart.length === 0 ? <div className="empty-cart"><Coffee size={34} strokeWidth={1.4} /><h3>Your bag is empty</h3><p>Good mornings are one bag away.</p><button onClick={() => setCartOpen(false)}>Explore coffee</button></div> : cart.map((item) => <div className="cart-item" key={item.id}><img src={item.image} alt="" /><div><h3>{item.name}</h3><span>{item.weight} · Whole bean</span><strong>₹{item.price}</strong></div><div className="quantity-control"><button onClick={() => changeQuantity(item.id, -1)} aria-label={`Remove one ${item.name}`}><Minus size={14} /></button><span>{item.quantity}</span><button onClick={() => changeQuantity(item.id, 1)} aria-label={`Add one ${item.name}`}><Plus size={14} /></button></div></div>)}
         </div>
-        {cart.length > 0 && <div className="cart-summary"><div><span>Subtotal</span><strong>₹{subtotal}</strong></div><p>Shipping calculated at checkout.</p><button>Checkout <ArrowRight size={18} /></button></div>}
+        {cart.length > 0 && <div className="cart-summary"><div><span>Subtotal</span><strong>₹{subtotal}</strong></div><p>Shipping calculated at checkout.</p>{checkoutMessage && <p className="checkout-message" aria-live="polite">{checkoutMessage}</p>}<button onClick={handleCheckout}>Checkout <ArrowRight size={18} /></button><form className="checkout-auth" onSubmit={handleAuth}><strong>{authTitle}</strong>{authMode === 'register' && <input value={authName} onChange={(event) => setAuthName(event.target.value)} placeholder="Your name" required /> }<input value={authEmail} onChange={(event) => setAuthEmail(event.target.value)} type="email" placeholder="Email address" required /><input value={authPassword} onChange={(event) => setAuthPassword(event.target.value)} type="password" placeholder="Password (8+ characters)" minLength="8" required /><button type="submit" disabled={authLoading}>{authSubmitLabel}</button><button type="button" className="auth-switch" onClick={() => { setAuthMode(authMode === 'login' ? 'register' : 'login'); setAuthMessage(''); setCheckoutMessage('') }}>{authSwitchLabel}</button>{authMessage && <span className="auth-message" aria-live="polite">{authMessage}</span>}</form></div>}
       </aside>
     </div>
   )

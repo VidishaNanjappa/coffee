@@ -16,7 +16,7 @@ p {
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; overscroll-behavior-x: none; }
 button, input { font: inherit; }
 button { cursor: pointer; }
 a { color: inherit; }
