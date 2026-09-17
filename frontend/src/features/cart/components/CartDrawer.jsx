@@ -1,7 +1,15 @@
 import { ArrowRight, Coffee, Minus, Plus, X } from 'lucide-react'
+import { useState } from 'react'
 import CheckoutAuthForm from '../../checkout/components/CheckoutAuthForm.jsx'
 
 function CartDrawer({ cart, cartOpen, onClose, changeQuantity, subtotal, checkout }) {
+  const [showAuth, setShowAuth] = useState(false)
+
+  function startCheckout() {
+    setShowAuth(true)
+    checkout.handleCheckout()
+  }
+
   return (
     <>
       <button className={cartOpen ? 'cart-backdrop visible' : 'cart-backdrop'} onClick={onClose} aria-label="Close shopping bag" />
@@ -20,11 +28,16 @@ function CartDrawer({ cart, cartOpen, onClose, changeQuantity, subtotal, checkou
             </div>
           ) : cart.map((item) => (
             <div className="cart-item" key={item.id}>
-              <img src={item.image} alt="" />
-              <div><h3>{item.name}</h3><span>{item.weight} · Whole bean</span><strong>₹{item.price}</strong></div>
+              <img src={item.image} alt={`${item.name} coffee bag`} />
+              <div className="cart-item-details">
+                <h3>{item.name}</h3>
+                <span>{item.weight} · Whole bean · {item.roast}</span>
+                <small>{item.notes}</small>
+                <strong>₹{item.price * item.quantity}</strong>
+              </div>
               <div className="quantity-control">
                 <button onClick={() => changeQuantity(item.id, -1)} aria-label={`Remove one ${item.name}`}><Minus size={14} /></button>
-                <span>{item.quantity}</span>
+                <span aria-label={`Quantity: ${item.quantity}`}>{item.quantity}</span>
                 <button onClick={() => changeQuantity(item.id, 1)} aria-label={`Add one ${item.name}`}><Plus size={14} /></button>
               </div>
             </div>
@@ -35,8 +48,8 @@ function CartDrawer({ cart, cartOpen, onClose, changeQuantity, subtotal, checkou
             <div><span>Subtotal</span><strong>₹{subtotal}</strong></div>
             <p>Shipping calculated at checkout.</p>
             {checkout.checkoutMessage && <p className="checkout-message" aria-live="polite">{checkout.checkoutMessage}</p>}
-            <button onClick={checkout.handleCheckout}>Checkout <ArrowRight size={18} /></button>
-            <CheckoutAuthForm checkout={checkout} />
+            <button onClick={startCheckout}>Checkout <ArrowRight size={18} /></button>
+            {showAuth && <CheckoutAuthForm checkout={checkout} />}
           </div>
         )}
       </aside>

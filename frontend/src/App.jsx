@@ -5,9 +5,12 @@ import CartDrawer from './features/cart/components/CartDrawer.jsx'
 import { useCart } from './features/cart/hooks/useCart.js'
 import { useCheckout } from './features/checkout/hooks/useCheckout.js'
 import HarvestTicker from './features/home/components/HarvestTicker.jsx'
+import EstateSection from './features/home/components/EstateSection.jsx'
 import Hero from './features/home/components/Hero.jsx'
 import Newsletter from './features/home/components/Newsletter.jsx'
+import ProcessingStory from './features/home/components/ProcessingStory.jsx'
 import PromiseStrip from './features/home/components/PromiseStrip.jsx'
+import Reviews from './features/home/components/Reviews.jsx'
 import RitualSection from './features/home/components/RitualSection.jsx'
 import StorySection from './features/home/components/StorySection.jsx'
 import { products } from './features/products/data/products.js'
@@ -39,7 +42,10 @@ function App() {
         <PromiseStrip />
         <HarvestTicker />
         <ProductsSection products={products} onAdd={handleAddToCart} />
+        <ProcessingStory />
         <StorySection />
+        <EstateSection />
+        <Reviews />
         <RitualSection />
         <Newsletter />
       </main>
