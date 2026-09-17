@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const dataPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'db.json')
+const dataPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'data', 'db.json')
 
 export async function loadDatabase() {
   const contents = await readFile(dataPath, 'utf8')
