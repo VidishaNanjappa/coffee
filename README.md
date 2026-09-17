@@ -1,4 +1,22 @@
-# React + Vite
+# Coorg Cup
+
+Coorg Cup is a motion-driven coffee storefront for small-batch coffee from Coorg.
+
+## Project structure
+
+- `frontend/` contains the Vite and React storefront.
+- `backend/` is reserved for the API, authentication, orders, payments, and admin services.
+
+## Frontend commands
+
+Run these from `frontend/`:
+
+```powershell
+npm install
+npm run dev
+npm run build
+npm run lint
+```
 
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
