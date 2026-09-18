@@ -1,27 +1,46 @@
+import coffeeBlossom from '../../../assets/coffee_blossom.jpg'
+import coffeeDrying from '../../../assets/coffee_drying.jpg'
+import coffeeGrinding from '../../../assets/coffee_grinding.avif'
+import coffeePicking from '../../../assets/coffee_picking.jpg'
+import coffeePulping from '../../../assets/coffee_pulping.avif'
+import coffeeSorting from '../../../assets/coffee_sorting.jpg'
+
 const stages = [
   {
     number: '01',
-    title: 'Pick',
-    copy: 'Only ripe crimson cherries make the morning harvest. Every branch is picked by hand beneath the shade canopy.',
-    image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1200&q=85',
+    title: 'Blossom',
+    copy: 'After the blossom showers, coffee branches flower white. Each bloom slowly becomes a green cherry, then ripens to red.',
+    image: coffeeBlossom,
   },
   {
     number: '02',
-    title: 'Rest',
-    copy: 'The fruit is gently pulped, then rested just long enough for the sweetness inside each seed to deepen.',
-    image: 'https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=1200&q=85',
+    title: 'Pick',
+    copy: 'Ripe cherries are selectively hand-picked. On one branch, red fruit and unripe green cherries can grow side by side.',
+    image: coffeePicking,
   },
   {
     number: '03',
-    title: 'Sun',
-    copy: 'On raised patios, the beans meet the Coorg sun. They are turned through the day and tucked away before dusk.',
-    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1200&q=85',
+    title: 'Sort & clean',
+    copy: 'Leaves, twigs, damaged fruit, and unripe cherries are removed, leaving only the cleanest harvest for processing.',
+    image: coffeeSorting,
   },
   {
     number: '04',
-    title: 'Roast',
-    copy: 'Small batches are roasted close to home, preserving the quiet spice and soft fruit of the season.',
-    image: 'https://images.unsplash.com/photo-1520975958225-112042190a2c?auto=format&fit=crop&w=1200&q=85',
+    title: 'Process',
+    copy: 'Lots follow their character: naturally dried in fruit, washed after pulping and fermentation, or honey processed with some mucilage intact.',
+    image: coffeePulping,
+  },
+  {
+    number: '05',
+    title: 'Dry & cure',
+    copy: 'Coffee dries slowly on patios or raised beds, turned often for an even finish. Once dry, the parchment or husk is hulled away and green coffee is graded.',
+    image: coffeeDrying,
+  },
+  {
+    number: '06',
+    title: 'Roast & grind',
+    copy: 'Small batches are roasted close to home, then freshly ground to match the brew method and become a fragrant cup.',
+    image: coffeeGrinding,
   },
 ]
 
@@ -31,16 +50,16 @@ function ProcessingStory() {
       <div className="processing-intro reveal">
         <span className="kicker">The slow way through</span>
         <h2>From mist to<br /><em>morning ritual.</em></h2>
-        <p>Nothing rushed. Nothing hidden. Follow one harvest from the estate floor to your cup.</p>
+        <p>From blossom showers to the final grind, follow an estate harvest through every careful stage.</p>
       </div>
       <div className="processing-stages">
-        {stages.map((stage) => (
-          <article className="process-stage reveal" key={stage.number}>
+        {stages.map((stage, index) => (
+          <article className={`process-stage reveal ${index % 2 ? 'process-stage-reverse' : ''}`} key={stage.number}>
             <div className="process-stage-image">
               <img src={stage.image} loading="lazy" alt={`${stage.title} stage of the coffee process`} />
-              <span>{stage.number}</span>
             </div>
             <div className="process-stage-copy">
+              <span className="process-number">{stage.number}</span>
               <h3>{stage.title}</h3>
               <p>{stage.copy}</p>
             </div>

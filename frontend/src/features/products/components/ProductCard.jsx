@@ -3,7 +3,7 @@ import { resetCard, tiltCard } from '../../../utils/tilt.js'
 
 function ProductCard({ product, index, onAdd }) {
   return (
-    <article className="product-card reveal" style={{ '--delay': `${index * 110}ms` }} onPointerMove={tiltCard} onPointerLeave={resetCard}>
+    <article className="product-card" onPointerMove={tiltCard} onPointerLeave={resetCard}>
       <div className="product-image-wrap">
         <img src={product.image} alt={`${product.name} coffee`} />
         <span className="product-tag">{product.tag}</span>
