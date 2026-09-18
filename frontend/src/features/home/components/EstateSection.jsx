@@ -1,11 +1,15 @@
-import { MapPin, Sprout } from 'lucide-react'
+import { Sprout } from 'lucide-react'
 
 function EstateSection() {
   return (
     <section className="estate-section reveal" id="estate">
-      <div className="estate-map" role="img" aria-label="Map showing Coorg in Karnataka, India">
-        <img src="https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=1500&q=85" loading="lazy" alt="Misty green hills in Coorg" />
-        <span className="map-pin"><MapPin size={20} fill="currentColor" /> Coorg</span>
+      <div className="estate-map">
+        <iframe
+          title="Map of Somwarpet, Coorg, Karnataka"
+          src="https://www.google.com/maps?q=12.5956,75.8514&z=12&output=embed"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
       </div>
       <div className="estate-copy">
         <span className="kicker"><Sprout size={15} /> 12.3375 N, 75.8069 E</span>

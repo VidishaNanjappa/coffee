@@ -6,7 +6,7 @@ function CartDrawer({ cart, cartOpen, onClose, changeQuantity, subtotal, checkou
   const [showAuth, setShowAuth] = useState(false)
 
   function startCheckout() {
-    setShowAuth(true)
+    setShowAuth(!checkout.isAuthenticated)
     checkout.handleCheckout()
   }
 
@@ -49,7 +49,7 @@ function CartDrawer({ cart, cartOpen, onClose, changeQuantity, subtotal, checkou
             <p>Shipping calculated at checkout.</p>
             {checkout.checkoutMessage && <p className="checkout-message" aria-live="polite">{checkout.checkoutMessage}</p>}
             <button onClick={startCheckout}>Checkout <ArrowRight size={18} /></button>
-            {showAuth && <CheckoutAuthForm checkout={checkout} />}
+            {showAuth && !checkout.isAuthenticated && <CheckoutAuthForm checkout={checkout} />}
           </div>
         )}
       </aside>

@@ -5,6 +5,7 @@ import { startCheckout } from '../../../api/paymentsApi.js'
 import { AUTH_TOKEN_KEY } from '../../../utils/constants.js'
 
 export function useCheckout(cart) {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => Boolean(window.localStorage.getItem(AUTH_TOKEN_KEY)))
   const [authMode, setAuthMode] = useState('login')
   const [authName, setAuthName] = useState('')
   const [authEmail, setAuthEmail] = useState('')
@@ -34,6 +35,7 @@ export function useCheckout(cart) {
       await completeCheckout(token)
     } catch (error) {
       window.localStorage.removeItem(AUTH_TOKEN_KEY)
+      setIsAuthenticated(false)
       setCheckoutMessage(error.message)
     }
   }
@@ -47,6 +49,7 @@ export function useCheckout(cart) {
         ? login({ email: authEmail, password: authPassword })
         : register({ name: authName, email: authEmail, password: authPassword }))
       window.localStorage.setItem(AUTH_TOKEN_KEY, result.token)
+      setIsAuthenticated(true)
       setAuthMessage('Signed in. Starting checkout...')
       await completeCheckout(result.token)
     } catch (error) {
@@ -64,7 +67,7 @@ export function useCheckout(cart) {
   }
 
   return {
-    authMode, authName, setAuthName, authEmail, setAuthEmail, authPassword, setAuthPassword,
+    isAuthenticated, authMode, authName, setAuthName, authEmail, setAuthEmail, authPassword, setAuthPassword,
     authMessage, checkoutMessage, authLoading, handleCheckout, handleAuth, toggleAuthMode,
   }
 }
