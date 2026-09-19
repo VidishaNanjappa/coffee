@@ -3,19 +3,27 @@ import ScrollText from '../../../components/common/ScrollText.jsx'
 import ProductRail from './ProductRail.jsx'
 
 function ProductsSection({ products, onAdd }) {
-  const [filter, setFilter] = useState('All')
-  const filters = ['All', 'Light roast', 'Medium roast', 'Dark roast']
-  const visibleProducts = filter === 'All' ? products : products.filter((product) => product.roast === filter)
+  const [category, setCategory] = useState('Coffee')
+  const [roast, setRoast] = useState('All')
+  const categories = ['Coffee', 'Honey', 'Spices']
+  const roasts = ['All', ...new Set(products.filter((product) => product.category === 'Coffee').map((product) => product.roast))]
+  const categoryProducts = products.filter((product) => product.category === category)
+  const visibleProducts = category === 'Coffee' && roast !== 'All'
+    ? categoryProducts.filter((product) => product.roast === roast)
+    : categoryProducts
 
   return (
     <section className="products-section reveal" id="coffee">
       <div className="section-heading">
         <div><span className="kicker">The current harvest</span><h2><ScrollText>Meet your morning cup.</ScrollText></h2></div>
-        <p>Three expressions of Coorg, each roasted to bring out what the bean does best.</p>
+        <p>Coffee is our first language. Explore the small-batch honey and estate spices we bring home from the same hills.</p>
       </div>
-      <div className="roast-filters" aria-label="Filter coffee by roast">
-        {filters.map((item) => <button className={filter === item ? 'active' : ''} onClick={() => setFilter(item)} key={item}>{item}</button>)}
+      <div className="product-categories" aria-label="Shop by category">
+        {categories.map((item) => <button className={category === item ? 'active' : ''} onClick={() => { setCategory(item); setRoast('All') }} key={item}>{item}</button>)}
       </div>
+      {category === 'Coffee' && <div className="roast-filters" aria-label="Filter coffee by roast">
+        {roasts.map((item) => <button className={roast === item ? 'active' : ''} onClick={() => setRoast(item)} key={item}>{item}</button>)}
+      </div>}
       <div className="rail-meta"><span>Drag to wander through the harvest</span><span className="rail-arrow">← &nbsp; →</span></div>
       <ProductRail products={visibleProducts} onAdd={onAdd} />
     </section>

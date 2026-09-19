@@ -6,7 +6,11 @@ export async function requestJson(url, options = {}) {
   try {
     const response = await fetch(url, { ...options, signal: controller.signal })
     const result = await response.json().catch(() => ({}))
-    if (!response.ok) throw new Error(result.error || `Request failed (${response.status})`)
+    if (!response.ok) {
+      const error = new Error(result.error || `Request failed (${response.status})`)
+      error.status = response.status
+      throw error
+    }
     return result
   } catch (error) {
     if (error.name === 'AbortError') throw new Error('The backend took too long to respond. Start it with npm run dev in backend.')

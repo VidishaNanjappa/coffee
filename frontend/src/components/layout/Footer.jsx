@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import Logo from './Logo.jsx'
 
 function Footer() {
@@ -6,8 +7,8 @@ function Footer() {
       <Logo />
       <p>Born in the hills. Roasted for everywhere.</p>
       <div className="footer-links">
-        <a href="#coffee">Shop</a>
-        <a href="#story">Story</a>
+        <Link to="/shop">Shop</Link>
+        <Link to="/story">Story</Link>
         <a href="mailto:hello@coorgcup.in">Contact</a>
       </div>
       <span>© 2026 Coorg Cup</span>

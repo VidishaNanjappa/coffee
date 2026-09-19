@@ -1,4 +1,5 @@
 import { ArrowRight, Leaf } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 function Hero() {
   return (
@@ -9,7 +10,7 @@ function Hero() {
         <span className="eyebrow"><Leaf size={15} /> Grown under the Coorg canopy</span>
         <h1>Wild hills.<br /><em>Remarkable coffee.</em></h1>
         <p>Shade-grown, hand-picked, and roasted in small batches. Coffee with the character of the Western Ghats.</p>
-        <a className="primary-button" href="#coffee">Find your roast <ArrowRight size={18} /></a>
+        <Link className="primary-button" to="/shop">Find your roast <ArrowRight size={18} /></Link>
       </div>
       <div className="hero-detail"><span>12.3375° N</span><span>75.8069° E</span><span>COORG, INDIA</span></div>
       <div className="scroll-cue"><span>Scroll to explore</span><i /></div>

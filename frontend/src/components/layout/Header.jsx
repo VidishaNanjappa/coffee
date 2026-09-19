@@ -1,4 +1,5 @@
 import { Menu, ShoppingBag, X } from 'lucide-react'
+import { NavLink } from 'react-router-dom'
 import Logo from './Logo.jsx'
 
 function Header({ menuOpen, onToggleMenu, itemCount, onOpenCart }) {
@@ -6,9 +7,9 @@ function Header({ menuOpen, onToggleMenu, itemCount, onOpenCart }) {
     <header className="site-header">
       <Logo />
       <nav className={menuOpen ? 'nav-links nav-open' : 'nav-links'} aria-label="Main navigation">
-        <a href="#coffee" onClick={() => onToggleMenu(false)}>Shop coffee</a>
-        <a href="#story" onClick={() => onToggleMenu(false)}>Our story</a>
-        <a href="#ritual" onClick={() => onToggleMenu(false)}>Brew guide</a>
+        <NavLink to="/" end onClick={() => onToggleMenu(false)}>Home</NavLink>
+        <NavLink to="/shop" onClick={() => onToggleMenu(false)}>Shop the harvest</NavLink>
+        <NavLink to="/story" onClick={() => onToggleMenu(false)}>Our story</NavLink>
       </nav>
       <div className="header-actions">
         <button className="icon-button mobile-menu" onClick={() => onToggleMenu(!menuOpen)} aria-label="Toggle menu">

@@ -5,7 +5,7 @@ function ProductCard({ product, index, onAdd }) {
   return (
     <article className="product-card" onPointerMove={tiltCard} onPointerLeave={resetCard}>
       <div className="product-image-wrap">
-        <img src={product.image} alt={`${product.name} coffee`} />
+        <img src={product.image} alt={`${product.name} ${product.category.toLowerCase()}`} />
         <span className="product-tag">{product.tag}</span>
         <span className="product-index">0{index + 1}</span>
       </div>
@@ -16,7 +16,7 @@ function ProductCard({ product, index, onAdd }) {
         </div>
         <p>{product.notes}</p>
         <div className="product-footer">
-          <span>{product.weight} · Whole bean</span>
+          <span>{product.format}</span>
           <button onClick={(event) => { event.stopPropagation(); onAdd(product) }} aria-label={`Add ${product.name} to bag`}>
             <Plus size={18} /> Add
           </button>

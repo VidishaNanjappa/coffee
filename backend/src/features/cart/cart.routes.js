@@ -45,4 +45,12 @@ router.delete('/items/:productId', authRequired, async (request, response) => {
   response.json({ cart: hydrateCart(database, cart) })
 })
 
+router.delete('/', authRequired, async (request, response) => {
+  const database = await loadDatabase()
+  const cart = getCart(database, request.auth.sub)
+  cart.items = []
+  await saveDatabase(database)
+  response.json({ cart: hydrateCart(database, cart) })
+})
+
 export default router

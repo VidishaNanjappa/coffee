@@ -7,3 +7,10 @@ export function addCartItem(token, { productId, quantity }) {
     body: JSON.stringify({ productId, quantity }),
   })
 }
+
+export function clearCart(token) {
+  return requestJson(`${apiBase}/cart`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}

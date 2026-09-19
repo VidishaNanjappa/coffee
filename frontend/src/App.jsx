@@ -1,66 +1,20 @@
-import { useState } from 'react'
-import Footer from './components/layout/Footer.jsx'
-import Header from './components/layout/Header.jsx'
-import CartDrawer from './features/cart/components/CartDrawer.jsx'
-import { useCart } from './features/cart/hooks/useCart.js'
-import { useCheckout } from './features/checkout/hooks/useCheckout.js'
-import HarvestTicker from './features/home/components/HarvestTicker.jsx'
-import EstateSection from './features/home/components/EstateSection.jsx'
-import Hero from './features/home/components/Hero.jsx'
-import Newsletter from './features/home/components/Newsletter.jsx'
-import ProcessingStory from './features/home/components/ProcessingStory.jsx'
-import PromiseStrip from './features/home/components/PromiseStrip.jsx'
-import Reviews from './features/home/components/Reviews.jsx'
-import RitualSection from './features/home/components/RitualSection.jsx'
-import StorySection from './features/home/components/StorySection.jsx'
-import { products } from './features/products/data/products.js'
-import ProductsSection from './features/products/components/ProductsSection.jsx'
-import { useScrollEffects } from './hooks/useScrollEffects.js'
+import { Route, Routes } from 'react-router-dom'
+import Layout from './components/layout/Layout.jsx'
+import HomePage from './pages/HomePage.jsx'
+import ShopPage from './pages/ShopPage.jsx'
+import StoryPage from './pages/StoryPage.jsx'
 import './App.css'
 
 function App() {
-  const [cartOpen, setCartOpen] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const { cart, addToCart, changeQuantity, itemCount, subtotal } = useCart()
-  const checkout = useCheckout(cart)
-
-  useScrollEffects()
-
-  function handleAddToCart(product) {
-    addToCart(product)
-    setCartOpen(true)
-  }
-
   return (
-    <div id="top">
-      <div className="scroll-progress" aria-hidden="true" />
-      <div className="announcement"><span>Roasted fresh in Coorg</span><span className="announcement-dot">✦</span><span>Free shipping above ₹999</span></div>
-      <Header menuOpen={menuOpen} onToggleMenu={setMenuOpen} itemCount={itemCount} onOpenCart={() => setCartOpen(true)} />
-
-      <main>
-        <Hero />
-        <PromiseStrip />
-        <HarvestTicker />
-        <ProductsSection products={products} onAdd={handleAddToCart} />
-        <ProcessingStory />
-        <StorySection />
-        <EstateSection />
-        <Reviews />
-        <RitualSection />
-        <Newsletter />
-      </main>
-
-      <Footer />
-
-      <CartDrawer
-        cart={cart}
-        cartOpen={cartOpen}
-        onClose={() => setCartOpen(false)}
-        changeQuantity={changeQuantity}
-        subtotal={subtotal}
-        checkout={checkout}
-      />
-    </div>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="shop" element={<ShopPage />} />
+        <Route path="story" element={<StoryPage />} />
+        <Route path="*" element={<HomePage />} />
+      </Route>
+    </Routes>
   )
 }
 

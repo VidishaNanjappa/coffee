@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-export function useScrollEffects() {
+export function useScrollEffects(key) {
   useEffect(() => {
     const revealItems = document.querySelectorAll('.reveal')
     const observer = new IntersectionObserver((entries) => {
@@ -33,5 +33,5 @@ export function useScrollEffects() {
       cancelAnimationFrame(frameId)
       window.removeEventListener('scroll', updateProgress)
     }
-  }, [])
+  }, [key])
 }

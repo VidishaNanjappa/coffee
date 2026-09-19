@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { login, register } from '../../../api/authApi.js'
-import { addCartItem } from '../../../api/cartApi.js'
+import { addCartItem, clearCart } from '../../../api/cartApi.js'
 import { startCheckout } from '../../../api/paymentsApi.js'
 import { AUTH_TOKEN_KEY } from '../../../utils/constants.js'
 
@@ -15,6 +15,7 @@ export function useCheckout(cart) {
   const [authLoading, setAuthLoading] = useState(false)
 
   async function completeCheckout(token) {
+    await clearCart(token)
     await Promise.all(cart.map((item) => addCartItem(token, { productId: item.id, quantity: item.quantity })))
     const result = await startCheckout(token)
     if (result.checkoutUrl) window.location.assign(result.checkoutUrl)
@@ -34,8 +35,10 @@ export function useCheckout(cart) {
     try {
       await completeCheckout(token)
     } catch (error) {
-      window.localStorage.removeItem(AUTH_TOKEN_KEY)
-      setIsAuthenticated(false)
+      if (error.status === 401) {
+        window.localStorage.removeItem(AUTH_TOKEN_KEY)
+        setIsAuthenticated(false)
+      }
       setCheckoutMessage(error.message)
     }
   }
