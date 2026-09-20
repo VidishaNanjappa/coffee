@@ -1,16 +1,14 @@
 import { Router } from 'express'
 import { frontendUrl } from '../../config/env.js'
-import { loadDatabase } from '../../db/store.js'
 import { razorpay } from '../../lib/razorpay.js'
 import { stripe } from '../../lib/stripe.js'
 import { authRequired } from '../../middleware/auth.js'
-import { getCart, hydrateCart } from '../cart/cart.service.js'
+import { getOrCreateCart, serializeCart } from '../cart/cart.service.js'
 
 const router = Router()
 
 router.post('/checkout', authRequired, async (request, response) => {
-  const database = await loadDatabase()
-  const cart = hydrateCart(database, getCart(database, request.auth.sub))
+  const cart = serializeCart(await getOrCreateCart(request.auth.sub))
   if (!cart.items.length) return response.status(400).json({ error: 'Your cart is empty' })
   if (razorpay) {
     const amount = cart.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0) * 100

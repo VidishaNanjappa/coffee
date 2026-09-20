@@ -1,33 +1,41 @@
 import { Router } from 'express'
-import { createId, loadDatabase, saveDatabase } from '../../db/store.js'
+import { prisma } from '../../db/prisma.js'
 import { authRequired } from '../../middleware/auth.js'
-import { getCart, hydrateCart } from '../cart/cart.service.js'
+import { getOrCreateCart, serializeCart } from '../cart/cart.service.js'
 
 const router = Router()
 
 router.post('/', authRequired, async (request, response) => {
-  const database = await loadDatabase()
-  const cart = getCart(database, request.auth.sub)
-  const hydratedCart = hydrateCart(database, cart)
-  if (!hydratedCart.items.length) return response.status(400).json({ error: 'Your cart is empty' })
-  const order = {
-    id: createId('order'),
-    userId: request.auth.sub,
-    items: hydratedCart.items.map(({ product, quantity, lineTotal }) => ({ productId: product.id, name: product.name, price: product.price, quantity, lineTotal })),
-    subtotal: hydratedCart.subtotal,
-    status: 'pending_payment',
-    shippingAddress: request.body.shippingAddress || null,
-    createdAt: new Date().toISOString(),
-  }
-  database.orders.push(order)
-  cart.items = []
-  await saveDatabase(database)
+  const cart = serializeCart(await getOrCreateCart(request.auth.sub))
+  if (!cart.items.length) return response.status(400).json({ error: 'Your cart is empty' })
+  const order = await prisma.$transaction(async (tx) => {
+    const created = await tx.order.create({
+      data: {
+        userId: request.auth.sub,
+        subtotal: cart.subtotal,
+        status: 'pending_payment',
+        shippingAddress: request.body.shippingAddress ?? undefined,
+        items: {
+          create: cart.items.map((item) => ({
+            productId: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity,
+            lineTotal: item.lineTotal,
+          })),
+        },
+      },
+      include: { items: true },
+    })
+    await tx.cartItem.deleteMany({ where: { cart: { userId: request.auth.sub } } })
+    return created
+  })
   response.status(201).json({ order })
 })
 
 router.get('/', authRequired, async (request, response) => {
-  const database = await loadDatabase()
-  response.json({ orders: database.orders.filter((order) => order.userId === request.auth.sub) })
+  const orders = await prisma.order.findMany({ where: { userId: request.auth.sub }, include: { items: true }, orderBy: { createdAt: 'desc' } })
+  response.json({ orders })
 })
 
 export default router

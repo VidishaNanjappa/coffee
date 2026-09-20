@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createId, loadDatabase, saveDatabase } from '../../db/store.js'
+import { prisma } from '../../db/prisma.js'
 import { adminRequired, authRequired } from '../../middleware/auth.js'
 import { requiredText } from '../../utils/validation.js'
 
@@ -7,61 +7,61 @@ const router = Router()
 router.use(authRequired, adminRequired)
 
 router.get('/products', async (request, response) => {
-  const database = await loadDatabase()
-  response.json({ products: database.products })
+  const products = await prisma.product.findMany({ orderBy: { name: 'asc' } })
+  response.json({ products })
 })
 
 router.post('/products', async (request, response) => {
-  const database = await loadDatabase()
-  const product = {
-    id: createId('product'),
-    name: requiredText(request.body.name, 'Name'),
-    roast: request.body.roast || '',
-    notes: request.body.notes || '',
-    price: Number(request.body.price),
-    weight: request.body.weight || '250g',
-    image: request.body.image || '',
-    tag: request.body.tag || '',
-    active: request.body.active !== false,
-  }
-  if (!Number.isFinite(product.price) || product.price <= 0) return response.status(400).json({ error: 'Price must be a positive number' })
-  database.products.push(product)
-  await saveDatabase(database)
+  const price = Number(request.body.price)
+  if (!Number.isFinite(price) || price <= 0) return response.status(400).json({ error: 'Price must be a positive number' })
+  const product = await prisma.product.create({
+    data: {
+      name: requiredText(request.body.name, 'Name'),
+      category: request.body.category || 'Coffee',
+      roast: request.body.roast || '',
+      notes: request.body.notes || '',
+      price: Math.round(price),
+      weight: request.body.weight || '250g',
+      image: request.body.image || '',
+      tag: request.body.tag || '',
+      format: request.body.format || '',
+      active: request.body.active !== false,
+    },
+  })
   response.status(201).json({ product })
 })
 
 router.patch('/products/:id', async (request, response) => {
-  const database = await loadDatabase()
-  const product = database.products.find((item) => item.id === request.params.id)
-  if (!product) return response.status(404).json({ error: 'Product not found' })
-  Object.assign(product, request.body)
-  if (request.body.price !== undefined && (!Number.isFinite(Number(product.price)) || Number(product.price) <= 0)) return response.status(400).json({ error: 'Price must be a positive number' })
-  await saveDatabase(database)
+  const existing = await prisma.product.findUnique({ where: { id: request.params.id } })
+  if (!existing) return response.status(404).json({ error: 'Product not found' })
+  if (request.body.price !== undefined && (!Number.isFinite(Number(request.body.price)) || Number(request.body.price) <= 0)) return response.status(400).json({ error: 'Price must be a positive number' })
+  const data = {}
+  for (const field of ['name', 'category', 'roast', 'notes', 'weight', 'image', 'tag', 'format', 'active']) {
+    if (request.body[field] !== undefined) data[field] = request.body[field]
+  }
+  if (request.body.price !== undefined) data.price = Math.round(Number(request.body.price))
+  const product = await prisma.product.update({ where: { id: request.params.id }, data })
   response.json({ product })
 })
 
 router.delete('/products/:id', async (request, response) => {
-  const database = await loadDatabase()
-  const product = database.products.find((item) => item.id === request.params.id)
-  if (!product) return response.status(404).json({ error: 'Product not found' })
-  product.active = false
-  await saveDatabase(database)
+  const existing = await prisma.product.findUnique({ where: { id: request.params.id } })
+  if (!existing) return response.status(404).json({ error: 'Product not found' })
+  const product = await prisma.product.update({ where: { id: request.params.id }, data: { active: false } })
   response.json({ product })
 })
 
 router.get('/orders', async (request, response) => {
-  const database = await loadDatabase()
-  response.json({ orders: database.orders })
+  const orders = await prisma.order.findMany({ include: { items: true }, orderBy: { createdAt: 'desc' } })
+  response.json({ orders })
 })
 
 router.patch('/orders/:id', async (request, response) => {
-  const database = await loadDatabase()
-  const order = database.orders.find((item) => item.id === request.params.id)
-  if (!order) return response.status(404).json({ error: 'Order not found' })
   const allowedStatuses = ['pending_payment', 'paid', 'processing', 'shipped', 'delivered', 'cancelled']
   if (!allowedStatuses.includes(request.body.status)) return response.status(400).json({ error: 'Invalid order status' })
-  order.status = request.body.status
-  await saveDatabase(database)
+  const existing = await prisma.order.findUnique({ where: { id: request.params.id } })
+  if (!existing) return response.status(404).json({ error: 'Order not found' })
+  const order = await prisma.order.update({ where: { id: request.params.id }, data: { status: request.body.status }, include: { items: true } })
   response.json({ order })
 })
 

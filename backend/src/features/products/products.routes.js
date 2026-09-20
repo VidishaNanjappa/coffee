@@ -1,17 +1,15 @@
 import { Router } from 'express'
-import { loadDatabase } from '../../db/store.js'
+import { prisma } from '../../db/prisma.js'
 
 const router = Router()
 
 router.get('/', async (request, response) => {
-  const database = await loadDatabase()
-  const products = database.products.filter((product) => product.active !== false)
+  const products = await prisma.product.findMany({ where: { active: true }, orderBy: { name: 'asc' } })
   response.json({ products })
 })
 
 router.get('/:id', async (request, response) => {
-  const database = await loadDatabase()
-  const product = database.products.find((item) => item.id === request.params.id && item.active !== false)
+  const product = await prisma.product.findFirst({ where: { id: request.params.id, active: true } })
   if (!product) return response.status(404).json({ error: 'Product not found' })
   response.json({ product })
 })

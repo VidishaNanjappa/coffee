@@ -1,16 +1,21 @@
-export function getCart(database, userId) {
-  let cart = database.carts.find((item) => item.userId === userId)
-  if (!cart) {
-    cart = { userId, items: [] }
-    database.carts.push(cart)
-  }
-  return cart
+import { prisma } from '../../db/prisma.js'
+
+const cartInclude = { items: { include: { product: true }, orderBy: { productId: 'asc' } } }
+
+export async function getOrCreateCart(userId) {
+  return prisma.cart.upsert({ where: { userId }, create: { userId }, update: {}, include: cartInclude })
 }
 
-export function hydrateCart(database, cart) {
-  const items = cart.items.map((item) => {
-    const product = database.products.find((candidate) => candidate.id === item.productId)
-    return product ? { ...item, product, lineTotal: product.price * item.quantity } : null
-  }).filter(Boolean)
-  return { ...cart, items, subtotal: items.reduce((total, item) => total + item.lineTotal, 0) }
+export async function loadCart(userId) {
+  return prisma.cart.findUnique({ where: { userId }, include: cartInclude })
+}
+
+export function serializeCart(cart) {
+  const items = (cart?.items ?? []).map((item) => ({
+    productId: item.productId,
+    quantity: item.quantity,
+    product: item.product,
+    lineTotal: item.product.price * item.quantity,
+  }))
+  return { items, subtotal: items.reduce((total, item) => total + item.lineTotal, 0) }
 }
