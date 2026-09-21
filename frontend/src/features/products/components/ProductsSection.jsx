@@ -24,7 +24,7 @@ function ProductsSection({ products, onAdd }) {
       {category === 'Coffee' && <div className="roast-filters" aria-label="Filter coffee by roast">
         {roasts.map((item) => <button className={roast === item ? 'active' : ''} onClick={() => setRoast(item)} key={item}>{item}</button>)}
       </div>}
-      <div className="rail-meta"><span>Drag to wander through the harvest</span><span className="rail-arrow">← &nbsp; →</span></div>
+      <div className="rail-meta"><span>Swipe to explore the harvest</span><span className="rail-arrow">← &nbsp; →</span></div>
       <ProductRail products={visibleProducts} onAdd={onAdd} />
     </section>
   )

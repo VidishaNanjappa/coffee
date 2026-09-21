@@ -7,7 +7,8 @@ function ProductRail({ products, onAdd }) {
   const dragState = useRef({ startX: 0, scrollLeft: 0 })
 
   function startDrag(event) {
-    if (!railRef.current) return
+    // Let touch devices scroll natively (with momentum); only drag with a mouse.
+    if (!railRef.current || event.pointerType !== 'mouse') return
     setIsDragging(true)
     dragState.current = { startX: event.clientX, scrollLeft: railRef.current.scrollLeft }
   }
