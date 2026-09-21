@@ -29,7 +29,7 @@ function Layout() {
     <div id="top">
       <div className="scroll-progress" aria-hidden="true" />
       <div className="announcement"><span>Roasted fresh in Coorg</span><span className="announcement-dot">✦</span><span>Free shipping above ₹999</span></div>
-      <Header menuOpen={menuOpen} onToggleMenu={setMenuOpen} itemCount={itemCount} onOpenCart={() => setCartOpen(true)} isAuthenticated={checkout.isAuthenticated} user={checkout.user} onSignOut={() => checkout.signOut()} />
+      <Header menuOpen={menuOpen} onToggleMenu={setMenuOpen} itemCount={itemCount} onOpenCart={() => setCartOpen(true)} />
 
       <main>
         <div className="page" key={location.pathname}>
