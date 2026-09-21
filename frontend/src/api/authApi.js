@@ -15,3 +15,9 @@ export function register({ name, email, password }) {
     body: JSON.stringify({ name, email, password }),
   })
 }
+
+export function getMe(token) {
+  return requestJson(`${apiBase}/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}

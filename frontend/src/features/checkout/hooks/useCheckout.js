@@ -1,10 +1,11 @@
-import { useState } from 'react'
-import { login, register } from '../../../api/authApi.js'
+import { useEffect, useState } from 'react'
+import { getMe, login, register } from '../../../api/authApi.js'
 import { addCartItem, clearCart } from '../../../api/cartApi.js'
 import { startCheckout } from '../../../api/paymentsApi.js'
 import { AUTH_TOKEN_KEY } from '../../../utils/constants.js'
 
 export function useCheckout(cart) {
+  const [user, setUser] = useState(null)
   const [isAuthenticated, setIsAuthenticated] = useState(() => Boolean(window.localStorage.getItem(AUTH_TOKEN_KEY)))
   const [authMode, setAuthMode] = useState('login')
   const [authName, setAuthName] = useState('')
@@ -13,6 +14,23 @@ export function useCheckout(cart) {
   const [authMessage, setAuthMessage] = useState('')
   const [checkoutMessage, setCheckoutMessage] = useState('')
   const [authLoading, setAuthLoading] = useState(false)
+
+  function signOut(message = '') {
+    window.localStorage.removeItem(AUTH_TOKEN_KEY)
+    setUser(null)
+    setIsAuthenticated(false)
+    setAuthMessage('')
+    setCheckoutMessage(message)
+  }
+
+  // Validate any stored session on load; a stale or expired token quietly signs the user out.
+  useEffect(() => {
+    const token = window.localStorage.getItem(AUTH_TOKEN_KEY)
+    if (!token) return
+    getMe(token)
+      .then((result) => { setUser(result.user); setIsAuthenticated(true) })
+      .catch((error) => { if (error.status === 401) signOut() })
+  }, [])
 
   async function completeCheckout(token) {
     await clearCart(token)
@@ -35,11 +53,8 @@ export function useCheckout(cart) {
     try {
       await completeCheckout(token)
     } catch (error) {
-      if (error.status === 401) {
-        window.localStorage.removeItem(AUTH_TOKEN_KEY)
-        setIsAuthenticated(false)
-      }
-      setCheckoutMessage(error.message)
+      if (error.status === 401) signOut('Your session expired. Please sign in again to continue.')
+      else setCheckoutMessage(error.message)
     }
   }
 
@@ -52,6 +67,7 @@ export function useCheckout(cart) {
         ? login({ email: authEmail, password: authPassword })
         : register({ name: authName, email: authEmail, password: authPassword }))
       window.localStorage.setItem(AUTH_TOKEN_KEY, result.token)
+      setUser(result.user)
       setIsAuthenticated(true)
       setAuthMessage('Signed in. Starting checkout...')
       await completeCheckout(result.token)
@@ -70,7 +86,7 @@ export function useCheckout(cart) {
   }
 
   return {
-    isAuthenticated, authMode, authName, setAuthName, authEmail, setAuthEmail, authPassword, setAuthPassword,
+    user, isAuthenticated, signOut, authMode, authName, setAuthName, authEmail, setAuthEmail, authPassword, setAuthPassword,
     authMessage, checkoutMessage, authLoading, handleCheckout, handleAuth, toggleAuthMode,
   }
 }

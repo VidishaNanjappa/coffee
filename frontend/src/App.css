@@ -200,6 +200,9 @@
 .cart-button { display:flex; align-items:center; gap:8px; padding:10px 0 10px 14px; }
 .cart-button span { font-size:10px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; }
 .cart-button b { width:19px; height:19px; display:grid; place-items:center; color:white; background:var(--ink); border-radius:50%; font-size:9px; }
+.signout-button { display:flex; align-items:center; gap:7px; padding:9px 14px; border:1px solid var(--line); border-radius:999px; background:transparent; color:var(--ink); cursor:pointer; transition:background .2s,border-color .2s; }
+.signout-button span { font-size:10px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; }
+.signout-button:hover { border-color:var(--clay); color:var(--clay); }
 .icon-button { width:42px; height:42px; display:grid; place-items:center; }
 .mobile-menu { display:none; }
 .hero-section { min-height:calc(100svh - 114px); max-height:860px; position:relative; display:flex; align-items:flex-end; overflow:hidden; color:white; }
@@ -376,6 +379,8 @@ footer p,footer>span { margin:0; color:rgba(255,255,255,.55); font-size:11px; }
   .nav-links.nav-open { display:flex; }
   .header-actions { grid-column:2; grid-row:1; }
   .cart-button span { display:none; }
+  .signout-button span { display:none; }
+  .signout-button { padding:9px; }
   .hero-section { min-height:calc(100svh - 98px); }
   .hero-content { margin-left:7vw; }
   .hero-detail { display:none; }

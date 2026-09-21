@@ -1,6 +1,6 @@
 import cors from 'cors'
 import express from 'express'
-import { frontendUrl } from './config/env.js'
+import { allowedOrigins } from './config/env.js'
 import adminRoutes from './features/admin/admin.routes.js'
 import authRoutes from './features/auth/auth.routes.js'
 import cartRoutes from './features/cart/cart.routes.js'
@@ -11,7 +11,13 @@ import { errorHandler } from './middleware/errorHandler.js'
 
 export const app = express()
 
-app.use(cors({ origin: frontendUrl }))
+app.use(cors({
+  origin(origin, callback) {
+    // Allow same-origin/non-browser requests (no Origin header) and any configured frontend origin.
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true)
+    callback(new Error('Not allowed by CORS'))
+  },
+}))
 app.use(express.json())
 
 app.get('/api/health', (request, response) => response.json({ ok: true, service: 'coorg-cup-backend' }))
