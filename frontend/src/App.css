@@ -254,6 +254,7 @@
 .harvest-ticker div { display:flex; width:max-content; gap:34px; align-items:center; animation:ticker 28s linear infinite; }
 .harvest-ticker b { color:#f1c65d; font-size:14px; }
 .products-section { padding:124px clamp(24px,6vw,90px) 130px; }
+.shop-status { text-align:center; font-size:15px; color:var(--ink); opacity:.7; padding:40px 0; }
 .processing-section { background:#d9dfd1; color:#26352c; padding:112px clamp(24px,8vw,130px); }
 .processing-intro { max-width:890px; margin:0 auto 90px; text-align:center; }
 .processing-intro .kicker { justify-content:center; color:#a84229; }
