@@ -3,20 +3,16 @@ import { fetchProducts } from '../../../api/productsApi.js'
 import { products as fallbackProducts } from '../data/products.js'
 
 export function useProducts() {
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
+  // Seed with the built-in catalog so the shop renders instantly, even during a backend cold start.
+  const [products, setProducts] = useState(fallbackProducts)
 
   useEffect(() => {
     let active = true
     fetchProducts()
-      .then((result) => { if (active) setProducts(result.products) })
-      .catch(() => {
-        // Backend unreachable (e.g. free-tier cold start): show the built-in catalog instead of an empty shop.
-        if (active) setProducts(fallbackProducts)
-      })
-      .finally(() => { if (active) setLoading(false) })
+      .then((result) => { if (active && result.products?.length) setProducts(result.products) })
+      .catch(() => {})
     return () => { active = false }
   }, [])
 
-  return { products, loading }
+  return { products }
 }

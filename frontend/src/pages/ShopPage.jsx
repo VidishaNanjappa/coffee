@@ -4,9 +4,7 @@ import { useProducts } from '../features/products/hooks/useProducts.js'
 
 function ShopPage() {
   const { onAdd } = useOutletContext()
-  const { products, loading } = useProducts()
-
-  if (loading) return <section className="products-section"><p className="shop-status">Loading the harvest...</p></section>
+  const { products } = useProducts()
 
   return <ProductsSection products={products} onAdd={onAdd} />
 }
